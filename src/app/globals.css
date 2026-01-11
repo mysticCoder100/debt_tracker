@@ -1,21 +1,55 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@layer base {
+    :root {
+        --radius: 0.5rem;
+        --sidebar-background: 0 0% 15%; /* Dark background */
+        --sidebar-foreground: 240 5.3% 90%; /* Light text for dark background */
+        --sidebar-primary: 240 5.9% 20%; /* Darker primary color */
+        --sidebar-primary-foreground: 0 0% 90%; /* Lighter text for primary color */
+        --sidebar-accent: 240 4.8% 50%; /* Darker accent color */
+        --sidebar-accent-foreground: 240 5.9% 90%; /* Light text for accent color */
+        --sidebar-border: 220 13% 40%; /* Darker border */
+        --sidebar-ring: 217.2 91.2% 30%; /* Darker ring */
+    }
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+    h1 {
+        @apply text-3xl;
+    }
+
+    h2 {
+        @apply text-2xl;
+    }
+
+    h3 {
+        @apply text-xl;
+    }
+
+    .dark {
+        --sidebar-background: 240 5.9% 10%; /* Very dark background */
+        --sidebar-foreground: 240 4.8% 95.9%; /* Light text for dark background */
+        --sidebar-primary: 224.3 76.3% 48%; /* Vibrant primary color */
+        --sidebar-primary-foreground: 0 0% 100%; /* Pure white for primary foreground */
+        --sidebar-accent: 240 3.7% 20%; /* Darker accent for slight differentiation */
+        --sidebar-accent-foreground: 240 4.8% 95.9%; /* Light text for accent */
+        --sidebar-border: 240 3.7% 25%; /* Slightly lighter border for separation */
+        --sidebar-ring: 217.2 91.2% 59.8%;
+    }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@layer components {
+    .dash-wrapper {
+        grid-template-rows: auto 1fr auto;
+        @apply w-full;
+    }
+
+    .grid-component {
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+    }
+
+    .add-transaction {
+        grid-template-rows: auto 1fr;
+    }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-}
