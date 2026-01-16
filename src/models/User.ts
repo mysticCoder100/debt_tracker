@@ -47,7 +47,7 @@ export class User extends Model {
         return await this.query<T>(sql, [`%${search}%`]);
     }
 
-    async deleteUser(id: number): Promise<boolean> {
+    async deleteUser(id: number | string): Promise<boolean> {
         const query = `DELETE
                        FROM ${this.table}
                        WHERE id = ?`;

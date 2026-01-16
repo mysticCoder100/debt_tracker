@@ -8,6 +8,7 @@ import {formStatusType, initFormStatus} from "@/type/FormStatus";
 import {CircleAlert, Loader} from "lucide-react";
 import {Alert, AlertDescription} from "@/components/ui/alert";
 import {FormInput} from "@/components/FormInputs";
+import {NewUser} from "@/models/NewUser";
 
 
 export function AddCustomerForm({onSuccess}: { onSuccess?: () => void }) {

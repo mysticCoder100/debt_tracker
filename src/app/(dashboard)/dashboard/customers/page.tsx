@@ -4,9 +4,10 @@ import {
     BreadcrumbList, BreadcrumbPage,
 } from "@/components/ui/breadcrumb";
 import UsersList from "@/components/UsersList";
-import {UserWithWalletType} from "@/type/UserType";
+import {FirestoreUserType, UserWithWalletType} from "@/type/UserType";
 import {User} from "@/models/User";
 import {RowsType, RowsTypeArray} from "@/type/rowsType";
+import {NewUser} from "@/models/NewUser";
 
 export default async function Customer({searchParams}: {
     searchParams?: Promise<{ search: string, rows: RowsType, page: number }>
@@ -21,8 +22,8 @@ export default async function Customer({searchParams}: {
     const page = searchedItem?.page ?? 1;
 
     let users = !search ?
-        await (new User()).fetchWithWallet<UserWithWalletType>() :
-        await (new User()).fetchBySearch<UserWithWalletType>(search);
+        await (new NewUser()).fetchAll<FirestoreUserType>() :
+        await (new NewUser()).fetchBySearch<FirestoreUserType>(search);
 
     users = users?.sort((a, b) => a.name.localeCompare(b.name));
 
@@ -30,7 +31,7 @@ export default async function Customer({searchParams}: {
     const startIndex = (page - 1) * rows;
     const endIndex = startIndex + rows;
 
-    const filteredUsers = users?.slice(startIndex, endIndex);
+    const slicedUsers = users?.slice(startIndex, endIndex);
 
     return (
         <div className="pb-5">
@@ -42,7 +43,7 @@ export default async function Customer({searchParams}: {
                 </BreadcrumbList>
             </Breadcrumb>
 
-            <UsersList users={users} search={search} rows={rows} filteredUsers={filteredUsers} page={page}/>
+            <UsersList users={users} search={search} rows={rows} slicedUsers={slicedUsers} page={page}/>
         </div>
     );
 }

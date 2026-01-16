@@ -1,9 +1,11 @@
 "use server"
 
 import {formStatusType} from "@/type/FormStatus";
-import {UserSchema} from "@/type/UserType";
+import {AddFirebaseUserType, FirestoreUserType, UserSchema} from "@/type/UserType";
 import {User} from "@/models/User";
 import {revalidatePath} from "next/cache";
+import {ApplicationError} from "@/error/ApplicationError";
+import {NewUser} from "@/models/NewUser";
 
 
 export async function addCustomer(formStatus: formStatusType, formData: FormData): Promise<formStatusType> {
@@ -27,12 +29,8 @@ export async function addCustomer(formStatus: formStatusType, formData: FormData
 
     try {
 
-        const nameExists = await (new User()).countWhere<{ total: number }>("name", name);
-        const phonenumberExists = await (new User()).countWhere<{ total: number }>("phonenumber", phonenumber);
-
-        if (!nameExists || !phonenumberExists) {
-            throw new Error("Validation error: Unable to verify name or phone number existence.");
-        }
+        const nameExists = await (new NewUser()).countWhere("name", name);
+        const phonenumberExists = await (new NewUser()).countWhere("phonenumber", phonenumber);
 
         const errors: {
             name: string | null,
@@ -42,11 +40,11 @@ export async function addCustomer(formStatus: formStatusType, formData: FormData
             phonenumber: null
         };
 
-        if (nameExists && nameExists.total > 0) {
+        if (nameExists > 0) {
             errors.name = "This name already exists.";
         }
 
-        if (phonenumberExists && phonenumberExists.total > 0) {
+        if (phonenumberExists > 0) {
             errors.phonenumber = "This phone number already exists.";
         }
 
@@ -59,26 +57,23 @@ export async function addCustomer(formStatus: formStatusType, formData: FormData
             };
         }
 
+        const data: AddFirebaseUserType = {
+            ...validatedFields.data,
+            balance: 0
+        };
 
-        const user = await (new User()).insert(
-            [name, phonenumber],
-            ["name", "phonenumber"]
-        );
+        const user = await (new NewUser()).insert<AddFirebaseUserType>(data);
 
-        if (user) {
-            revalidatePath("/dashboard/customers");
-            return {
-                status: "success",
-                message: "Customer Added Successfully",
-            }
+        revalidatePath("/dashboard/customers");
+        return {
+            status: "success",
+            message: "Customer Added Successfully",
         }
 
-        throw new Error("validation error");
-
-    } catch (e) {
+    } catch (e: unknown) {
         return {
             status: "failed",
-            message: "server error"
+            message: "Server Error"
         };
     }
 

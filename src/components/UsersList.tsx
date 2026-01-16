@@ -1,11 +1,10 @@
 "use client"
 
-import {UserWithWalletType} from "@/type/UserType";
+import {FirestoreUserType, UserWithWalletType} from "@/type/UserType";
 import {Button} from "@/components/ui/button";
 import {Binoculars, PlusIcon, Trash2} from "lucide-react";
 import Link from "next/link";
 import {Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger} from "@/components/ui/dialog";
-import {DialogBody} from "next/dist/client/components/react-dev-overlay/internal/components/Dialog";
 import {AddCustomerForm} from "@/components/AddCustomerForm";
 import {DataTableCol} from "@/type/DataTableType";
 import DataTable from "@/components/DataTable";
@@ -25,16 +24,17 @@ import {deleteUser} from "@/server/delete-user";
 import {RowSelector} from "@/components/RowSelector";
 import {RowsType} from "@/type/rowsType";
 import {Paginator} from "@/components/Paginator";
+import {useSyncQueryParams} from "@/hooks/use-sync-query-params";
 
-export default function UsersList({users, search, rows, filteredUsers, page}: {
-    users: UserWithWalletType[] | undefined;
-    filteredUsers: UserWithWalletType[] | undefined;
+export default function UsersList({users, search, rows, slicedUsers, page}: {
+    users: FirestoreUserType[] | undefined;
+    slicedUsers: UserWithWalletType[] | FirestoreUserType[] | undefined;
     page: number;
     search: string;
     rows: RowsType;
 }) {
 
-    const tableColumn: DataTableCol<UserWithWalletType>[] = [
+    const tableColumn: DataTableCol<FirestoreUserType>[] = [
         {
             label: "Name",
             key: "name"
@@ -49,7 +49,7 @@ export default function UsersList({users, search, rows, filteredUsers, page}: {
         },
         {
             label: "Actions",
-            render: ({id, name}: UserWithWalletType) => {
+            render: ({id, name}: FirestoreUserType) => {
                 return (
                     <div className="flex gap-3 justify-end">
                         <Button variant={"success"} size={"sm"} asChild>
@@ -75,7 +75,7 @@ export default function UsersList({users, search, rows, filteredUsers, page}: {
                                     <AlertDialogCancel>Cancel</AlertDialogCancel>
                                     <AlertDialogAction
                                         onClick={async () => {
-                                            await deleteUser(id);
+                                            await deleteUser(id as number);
                                         }}
                                     >
                                         Continue
@@ -95,12 +95,7 @@ export default function UsersList({users, search, rows, filteredUsers, page}: {
 
     const [isOpen, setOPen] = useState(false);
 
-    useEffect(() => {
-        const searchParam = new URLSearchParams(searchParams);
-        searchParam.set("rows", rows.toString());
-        searchParam.set("page", page.toString());
-        replace(`${path}?${searchParam.toString()}`);
-    }, [searchParams, path, replace, rows, page]);
+    useSyncQueryParams(rows, page);
 
     const handleInputChange = useDebouncedCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value.trim();
@@ -134,9 +129,7 @@ export default function UsersList({users, search, rows, filteredUsers, page}: {
                                 Add a Customer
                             </DialogTitle>
                         </DialogHeader>
-                        <DialogBody>
-                            <AddCustomerForm onSuccess={() => setOPen(false)}/>
-                        </DialogBody>
+                        <AddCustomerForm onSuccess={() => setOPen(false)}/>
                     </DialogContent>
                 </Dialog>
             </div>
@@ -144,12 +137,12 @@ export default function UsersList({users, search, rows, filteredUsers, page}: {
             <RowSelector/>
 
             <Suspense fallback={<TableSkeleton/>}>
-                <DataTable<UserWithWalletType> columns={tableColumn} data={filteredUsers}/>
+                <DataTable<FirestoreUserType> columns={tableColumn} data={slicedUsers}/>
             </Suspense>
 
             <Paginator
                 totalItems={users?.length ?? 0}
-                totalCurrentItems={filteredUsers?.length ?? 0}
+                totalCurrentItems={slicedUsers?.length ?? 0}
             />
         </div>
     );

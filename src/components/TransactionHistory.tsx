@@ -9,6 +9,7 @@ import {RowsType} from "@/type/rowsType";
 import {usePathname, useRouter, useSearchParams} from "next/navigation";
 import {Paginator} from "@/components/Paginator";
 import {TableSkeleton} from "@/components/Skeletons";
+import {useSyncQueryParams} from "@/hooks/use-sync-query-params";
 
 export function TransactionHistory({rows, userTransaction, filteredUserTransaction, page}: {
     rows: RowsType,
@@ -37,17 +38,7 @@ export function TransactionHistory({rows, userTransaction, filteredUserTransacti
 
     ]
 
-    const path = usePathname();
-    const searchParams = useSearchParams();
-    const {replace} = useRouter();
-
-
-    useEffect(() => {
-        const searchParam = new URLSearchParams(searchParams);
-        searchParam.set("rows", rows.toString());
-        searchParam.set("page", page.toString());
-        replace(`${path}?${searchParam.toString()}`);
-    }, [searchParams, path, replace, rows, page]);
+    useSyncQueryParams(rows, page);
 
     return (
         <div>

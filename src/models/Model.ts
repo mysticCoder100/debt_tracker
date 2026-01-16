@@ -6,7 +6,7 @@ export abstract class Model {
 
     protected connection: Pool;
 
-    constructor(tableName: string) {
+    protected constructor(tableName: string) {
         this.table = tableName;
         this.connection = Database.getInstance();
     }

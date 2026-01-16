@@ -23,12 +23,12 @@ export default async function Wallet({params, searchParams}: {
         Number(SEARCH_PARAMS?.rows) as RowsType :
         5;
     const page = SEARCH_PARAMS?.page ?? 1;
-    const email = PARAMS?.email;
+    const id = PARAMS?.email;
 
     const startIndex = (page - 1) * rows;
     const endIndex = startIndex + rows;
 
-    const userWallet = await (new User()).fetchWallet<UserWithWalletType>(Number(email));
+    const userWallet = await (new User()).fetchWallet<UserWithWalletType>(Number(id));
 
     if (!userWallet) {
         notFound();
