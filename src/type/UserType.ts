@@ -12,7 +12,7 @@ export type UserWithWalletType = UserType & {
 }
 
 export type FirestoreUserType = {
-    id: string | number;
+    id: string;
     name: string;
     phonenumber: string;
     balance: number;

@@ -2,9 +2,9 @@
 
 import {User} from "@/models/User";
 import {revalidatePath} from "next/cache";
+import {NewUser} from "@/models/NewUser";
 
-export async function deleteUser(userId: number | string): Promise<void | boolean> {
-    const deletedUser = await (new User()).deleteUser(userId)
+export async function deleteUser(userId: string): Promise<void> {
+    const deletedUser = await (new NewUser()).deleteUser(userId)
     revalidatePath("/dashboard/customers");
-    return deletedUser;
 }

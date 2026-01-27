@@ -6,7 +6,7 @@ import {
     collection,
     query,
     where as fireWhere,
-    getCountFromServer, CollectionReference, getDocs, QuerySnapshot,
+    getCountFromServer, CollectionReference, getDocs, QuerySnapshot, WhereFilterOp,
 } from "firebase/firestore";
 
 
@@ -27,10 +27,11 @@ export abstract class FirebaseModel {
         }
     }
 
-    async countWhere(where: string, params: string | number): Promise<number> {
+    async countWhere(where: string, params: string | number, operator: WhereFilterOp = "=="): Promise<number> {
         try {
             const userCol = collection(db, 'users');
-            const q = query(userCol, fireWhere(where, "==", params));
+            const q = query(userCol, fireWhere(where, operator, params));
+
             const snapshot = await getCountFromServer(q);
             return snapshot.data().count;
         } catch (e: unknown) {
@@ -40,9 +41,11 @@ export abstract class FirebaseModel {
 
     async fetchAll<T>(): Promise<T[]> {
         try {
-            const userCol = collection(db, 'users') as CollectionReference<T>;
+            const userCol = collection(db, this.documents) as CollectionReference<T>;
             const querySnapshot = await getDocs(userCol);
-            return querySnapshot.docs.map(doc => doc.data());
+            return querySnapshot.docs.map(doc => {
+                return {...doc.data(), id: doc.id};
+            });
         } catch (e: unknown) {
             this.catchError(e);
         }
@@ -50,7 +53,7 @@ export abstract class FirebaseModel {
 
     async count(): Promise<number> {
         try {
-            const userCol = collection(db, 'users');
+            const userCol = collection(db, this.documents);
             const snapshot = await getCountFromServer(userCol);
             return snapshot.data().count;
         } catch (e: unknown) {

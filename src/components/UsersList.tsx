@@ -28,7 +28,7 @@ import {useSyncQueryParams} from "@/hooks/use-sync-query-params";
 
 export default function UsersList({users, search, rows, slicedUsers, page}: {
     users: FirestoreUserType[] | undefined;
-    slicedUsers: UserWithWalletType[] | FirestoreUserType[] | undefined;
+    slicedUsers: FirestoreUserType[] | undefined;
     page: number;
     search: string;
     rows: RowsType;
@@ -75,7 +75,7 @@ export default function UsersList({users, search, rows, slicedUsers, page}: {
                                     <AlertDialogCancel>Cancel</AlertDialogCancel>
                                     <AlertDialogAction
                                         onClick={async () => {
-                                            await deleteUser(id as number);
+                                            await deleteUser(id);
                                         }}
                                     >
                                         Continue

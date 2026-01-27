@@ -1,23 +1,22 @@
 import React, {Suspense} from "react";
 import {Binoculars, TrendingDown, UserCheck, UserMinus, Users} from "lucide-react";
 import DashboardCard from "@/components/DashboardCard";
-import {User} from "@/models/User";
-import {UserWithWalletType} from "@/type/UserType";
+import {FirestoreUserType, UserWithWalletType} from "@/type/UserType";
 import {DataTableCol} from "@/type/DataTableType";
 import {Button} from "@/components/ui/button";
 import Link from "next/link";
 import DataTable from "@/components/DataTable";
-import {Wallet} from "@/models/Wallet";
 import {DebtorBar} from "@/components/DebtorsBar";
 import {DashboardCardSkeleton} from "@/components/Skeletons";
+import {NewUser} from "@/models/NewUser";
 
 export default async function Dashboard() {
 
-    const totalUsers = await (new User()).count<{ total: number }>();
-    const totalDebts = await (new Wallet()).allDebts<{ total: number }>();
-    const debtorsCounts = await (new Wallet()).debtorsCount<DebtorCountType>();
+    const totalUsers = await (new NewUser()).count();
+    const totalDebts = await (new NewUser()).totalDebts();
+    const debtorsCounts = await (new NewUser()).fetchDebtorsSummary();
 
-    const totalUsersCount = totalUsers?.total ?? 0;
+    const totalUsersCount = totalUsers;
     const totalDebtorsCount = debtorsCounts?.debtor ?? 0;
     const nonDebtors = debtorsCounts?.non_debtor ?? 0;
 
@@ -28,22 +27,17 @@ export default async function Dashboard() {
         {label: "Customer", value: totalUsersCount, icon: Users}
     ];
 
-    const topFiveDebtors = await (new User()).fetchTopFiveDebtors<UserWithWalletType>();
-
-    type DebtorCountType = {
-        debtor: number;
-        non_debtor: number;
-    };
+    const topFiveDebtors = await (new NewUser()).topFiveDebtors();
 
     const chartLabel = ["Debtors", "Non-Debtors"];
     const chartData = [debtorsCounts?.debtor || 0, debtorsCounts?.non_debtor || 0];
 
-    const tableColumns: DataTableCol<UserWithWalletType>[] = [
+    const tableColumns: DataTableCol<FirestoreUserType>[] = [
         {label: "Name", key: "name"},
         {label: "Total Debt(s)", key: "balance"},
         {
             label: "Actions",
-            render: ({id}: UserWithWalletType) => (
+            render: ({id}: FirestoreUserType) => (
                 <div className="flex justify-end">
                     <Button variant="success" size="sm" asChild>
                         <Link href={`/dashboard/customers/${id}/wallet`}>
@@ -82,7 +76,7 @@ export default async function Dashboard() {
                     <div>
                         <h3 className="text-right">Top 5 Debtors</h3>
                     </div>
-                    <DataTable<UserWithWalletType> columns={tableColumns} data={topFiveDebtors}/>
+                    <DataTable<FirestoreUserType> columns={tableColumns} data={topFiveDebtors}/>
                 </div>
             </section>
         </section>
