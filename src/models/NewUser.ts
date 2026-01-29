@@ -8,7 +8,7 @@ import {
     getDocs,
     query,
     where,
-    sum, orderBy, limit, doc, deleteDoc
+    sum, orderBy, limit, doc, deleteDoc, getDoc
 } from "firebase/firestore";
 import {DebtorCountType, TotalDebtType} from "@/type/DebtorCountType";
 import {FirestoreUserType} from "@/type/UserType";
@@ -36,40 +36,52 @@ export class NewUser extends FirebaseModel {
     }
 
     async fetchDebtorsSummary(): Promise<AggregateSpecData<DebtorCountType>> {
-        const userCollection = collection(db, this.documents);
+        try {
+            const userCollection = collection(db, this.documents);
 
-        const debtorQuery = query(userCollection, where("balance", ">", 0));
-        const nonDebtorQuery = query(userCollection, where("balance", "<=", 0));
+            const debtorQuery = query(userCollection, where("balance", ">", 0));
+            const nonDebtorQuery = query(userCollection, where("balance", "<=", 0));
 
-        const [debtorSnap, nonDebtorSnap] = await Promise.all([
-            getAggregateFromServer(debtorQuery, {debtorCount: count()}),
-            getAggregateFromServer(nonDebtorQuery, {nonDebtorCount: count()})
-        ]);
+            const [debtorSnap, nonDebtorSnap] = await Promise.all([
+                getAggregateFromServer(debtorQuery, {debtorCount: count()}),
+                getAggregateFromServer(nonDebtorQuery, {nonDebtorCount: count()})
+            ]);
 
-        return {
-            debtor: debtorSnap.data().debtorCount,
-            non_debtor: nonDebtorSnap.data().nonDebtorCount
-        };
+            return {
+                debtor: debtorSnap.data().debtorCount,
+                non_debtor: nonDebtorSnap.data().nonDebtorCount
+            };
+        } catch (e: unknown) {
+            this.catchError(e);
+        }
     }
 
     async totalDebts(): Promise<AggregateSpecData<TotalDebtType>> {
-        const usersCollection = collection(db, this.documents) as CollectionReference<FirestoreUserType, FirestoreUserType>;
+        try {
+            const usersCollection = collection(db, this.documents) as CollectionReference<FirestoreUserType, FirestoreUserType>;
 
-        const snapshot = await getAggregateFromServer<TotalDebtType, FirestoreUserType, FirestoreUserType>(usersCollection, {
-            total: sum("balance")
-        });
+            const snapshot = await getAggregateFromServer<TotalDebtType, FirestoreUserType, FirestoreUserType>(usersCollection, {
+                total: sum("balance")
+            });
 
-        return snapshot.data();
+            return snapshot.data();
+        } catch (e: unknown) {
+            this.catchError(e);
+        }
     }
 
     async topFiveDebtors(): Promise<FirestoreUserType[]> {
-        const usersCollection = collection(db, this.documents) as CollectionReference<FirestoreUserType, FirestoreUserType>;
-        const q = query(usersCollection, orderBy("balance", "desc"), limit(5));
-        const snapshots = await getDocs<FirestoreUserType, FirestoreUserType>(q);
+        try {
+            const usersCollection = collection(db, this.documents) as CollectionReference<FirestoreUserType, FirestoreUserType>;
+            const q = query(usersCollection, orderBy("balance", "desc"), limit(5));
+            const snapshots = await getDocs<FirestoreUserType, FirestoreUserType>(q);
 
-        return snapshots.docs.map(doc => {
-            return {...doc.data(), id: doc.id};
-        });
+            return snapshots.docs.map(doc => {
+                return {...doc.data(), id: doc.id};
+            });
+        } catch (e: unknown) {
+            this.catchError(e);
+        }
     }
 
     async deleteUser(id: string): Promise<boolean> {
@@ -79,8 +91,18 @@ export class NewUser extends FirebaseModel {
             await deleteDoc(userRef)
 
             return true;
-        } catch (e) {
-            return false;
+        } catch (e: unknown) {
+            this.catchError(e);
+        }
+    }
+
+    async fetch(id: string): Promise<FirestoreUserType> {
+        try {
+            const docRef = doc(db, this.documents, id);
+            const docSnap = await getDoc(docRef);
+            return docSnap.data() as FirestoreUserType;
+        } catch (e: unknown) {
+            this.catchError(e);
         }
     }
 }

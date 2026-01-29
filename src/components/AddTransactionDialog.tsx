@@ -5,10 +5,10 @@ import {Button} from "@/components/ui/button";
 import {PlusIcon} from "lucide-react";
 import {AddTransactionForm} from "@/components/AddTransactionForm";
 import {useState} from "react";
-import {UserType} from "@/type/UserType";
+import {FirestoreUserType, UserType} from "@/type/UserType";
 
 export function AddTransactionDialog({user}: {
-    user: UserType
+    user: FirestoreUserType
 }) {
 
     const [isOpen, setOPen] = useState(false);

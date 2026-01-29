@@ -1,6 +1,5 @@
 "use server"
 
-import {User} from "@/models/User";
 import {revalidatePath} from "next/cache";
 import {NewUser} from "@/models/NewUser";
 

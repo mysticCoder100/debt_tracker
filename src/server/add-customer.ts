@@ -2,9 +2,7 @@
 
 import {formStatusType} from "@/type/FormStatus";
 import {AddFirebaseUserType, FirestoreUserType, UserSchema} from "@/type/UserType";
-import {User} from "@/models/User";
 import {revalidatePath} from "next/cache";
-import {ApplicationError} from "@/error/ApplicationError";
 import {NewUser} from "@/models/NewUser";
 
 

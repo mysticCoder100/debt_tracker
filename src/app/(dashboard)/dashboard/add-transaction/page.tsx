@@ -1,12 +1,13 @@
 import {AddCustomerForm} from "@/components/AddCustomerForm";
 import {Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage} from "@/components/ui/breadcrumb";
 import {AddTransactionForm} from "@/components/AddTransactionForm";
-import {UserType} from "@/type/UserType";
+import {FirestoreUserType} from "@/type/UserType";
 import {User} from "@/models/User";
+import {NewUser} from "@/models/NewUser";
 
 export default async function AddTransactions() {
 
-    let users: UserType[] | undefined = await (new User()).fetchAll<UserType>(["id", "name"]);
+    let users: FirestoreUserType[] | undefined = await (new NewUser()).fetchAll<FirestoreUserType>();
 
     if (users == undefined || users.length === 0) {
         users = []
@@ -17,7 +18,9 @@ export default async function AddTransactions() {
             <Breadcrumb className="py-10 px-5">
                 <BreadcrumbList>
                     <BreadcrumbItem>
-                        <BreadcrumbPage className="text-3xl">Add Transactions</BreadcrumbPage>
+                        <BreadcrumbPage className="text-3xl">
+                            Add Transactions
+                        </BreadcrumbPage>
                     </BreadcrumbItem>
                 </BreadcrumbList>
             </Breadcrumb>

@@ -11,7 +11,7 @@ export async function addTransaction(formStatus: formStatusType, formData: FormD
     const validateFields = TransactionTypeSchema.safeParse({
         ...Object.fromEntries(formData.entries()),
         amount: Number(formData.get("amount")),
-        user_id: Number(formData.get("user_id")),
+        user_id: formData.get("user_id"),
     })
 
     if (!validateFields.success) {

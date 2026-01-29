@@ -10,6 +10,7 @@ import {TransactionType} from "@/type/TransactionType";
 import {AddTransactionDialog} from "@/components/AddTransactionDialog";
 import {RowsType, RowsTypeArray} from "@/type/rowsType";
 import {TransactionHistory} from "@/components/TransactionHistory";
+import {NewUser} from "@/models/NewUser";
 
 export default async function Wallet({params, searchParams}: {
     params?: Promise<{ email: string }>
@@ -23,18 +24,18 @@ export default async function Wallet({params, searchParams}: {
         Number(SEARCH_PARAMS?.rows) as RowsType :
         5;
     const page = SEARCH_PARAMS?.page ?? 1;
-    const id = PARAMS?.email;
+    const id = PARAMS?.email ?? "";
 
     const startIndex = (page - 1) * rows;
     const endIndex = startIndex + rows;
 
-    const userWallet = await (new User()).fetchWallet<UserWithWalletType>(Number(id));
+    const userWallet = await (new NewUser()).fetch(id);
 
     if (!userWallet) {
         notFound();
     }
 
-    const userTransaction = await (new Transaction()).userTransaction<TransactionType>(userWallet.id);
+    const userTransaction = await (new Transaction()).userTransaction<TransactionType>(2);
 
     const filteredUserTransaction = userTransaction?.slice(startIndex, endIndex);
 

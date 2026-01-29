@@ -10,11 +10,11 @@ import {initFormStatus} from "@/type/FormStatus";
 import Form from "next/form";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
 import {Textarea} from "@/components/ui/textarea";
-import {UserType} from "@/type/UserType";
+import {FirestoreUserType} from "@/type/UserType";
 import {clsx} from "clsx";
 
 export function AddTransactionForm({users, onSuccess}: {
-    users: UserType[]
+    users: FirestoreUserType[]
     onSuccess?: () => void;
 }) {
 
