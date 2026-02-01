@@ -1,11 +1,13 @@
 "use server"
 
 import {formStatusType} from "@/type/FormStatus";
-import {TransactionTypeSchema} from "@/type/TransactionType";
+import {TransactionType, TransactionTypeSchema} from "@/type/TransactionType";
 import Transaction from "@/models/Transaction";
 import {revalidatePath} from "next/cache";
 import {User} from "@/models/User";
 import {UserWithWalletType} from "@/type/UserType";
+import {NewUser} from "@/models/NewUser";
+import {NewTransaction} from "@/models/NewTransaction";
 
 export async function addTransaction(formStatus: formStatusType, formData: FormData): Promise<formStatusType> {
     const validateFields = TransactionTypeSchema.safeParse({
@@ -27,23 +29,17 @@ export async function addTransaction(formStatus: formStatusType, formData: FormD
 
     try {
 
-        if (transaction_type == 'credit') {
-            const currentDebit = await (new User()).fetchWallet<UserWithWalletType>(Number(user_id))
+        const amountToInsert = amount * 100;
 
-            if (currentDebit && (amount * 100) > currentDebit?.balance) {
-                return {
-                    status: "failed",
-                    message: "Crediting amount exceeds Customer's debit",
-                    formData
-                }
-            }
+        const transactionData: TransactionType = {
+            user_id,
+            transaction_type,
+            amount: amountToInsert,
+            description,
+            created_at: new Date()
+        };
 
-        }
-
-        await (new Transaction()).insert(
-            [user_id, transaction_type, amount * 100, description],
-            ["user_id", "transaction_type", "amount", "description"],
-        )
+        await (new NewTransaction()).addTransaction(user_id, transactionData);
 
         revalidatePath("/dashboard/customers/[email]/wallet");
 

@@ -9,10 +9,10 @@ export function currencyConverter(amount: number): string {
 }
 
 export function numberConverter(amount: number): string {
-    return (amount).toLocaleString("en-GB", {})
+    return (amount).toLocaleString("en-GB")
 }
 
 export function dateConverter(date: Date): string {
     const parsedDate = new Date(date);
-    return parsedDate.toLocaleDateString("en-GB", {})
+    return parsedDate.toLocaleDateString("en-GB")
 }

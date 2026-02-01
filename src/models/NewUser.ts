@@ -8,7 +8,7 @@ import {
     getDocs,
     query,
     where,
-    sum, orderBy, limit, doc, deleteDoc, getDoc
+    sum, orderBy, limit, doc, deleteDoc, getDoc, setDoc
 } from "firebase/firestore";
 import {DebtorCountType, TotalDebtType} from "@/type/DebtorCountType";
 import {FirestoreUserType} from "@/type/UserType";
@@ -100,7 +100,19 @@ export class NewUser extends FirebaseModel {
         try {
             const docRef = doc(db, this.documents, id);
             const docSnap = await getDoc(docRef);
-            return docSnap.data() as FirestoreUserType;
+            return {
+                ...docSnap.data(),
+                id: docSnap.id
+            } as FirestoreUserType;
+        } catch (e: unknown) {
+            this.catchError(e);
+        }
+    }
+
+    async updateBalance(userId: string, amount: number): Promise<void> {
+        try {
+            const userRef = doc(db, this.documents, userId);
+            await setDoc(userRef, {balance: amount}, {merge: true});
         } catch (e: unknown) {
             this.catchError(e);
         }

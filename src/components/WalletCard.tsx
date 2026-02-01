@@ -10,8 +10,8 @@ function WalletCard({balance, name}: {
     name: string,
 }) {
 
-    const [masked, setMasked] = useState<boolean>(false);
-    const maskedBalance = "*********";
+    const [masked, setMasked] = useState<boolean>(true);
+    const maskedBalance = "*******";
 
     return (
         <div className={""}>

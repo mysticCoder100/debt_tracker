@@ -11,6 +11,7 @@ import {AddTransactionDialog} from "@/components/AddTransactionDialog";
 import {RowsType, RowsTypeArray} from "@/type/rowsType";
 import {TransactionHistory} from "@/components/TransactionHistory";
 import {NewUser} from "@/models/NewUser";
+import {NewTransaction} from "@/models/NewTransaction";
 
 export default async function Wallet({params, searchParams}: {
     params?: Promise<{ email: string }>
@@ -35,7 +36,7 @@ export default async function Wallet({params, searchParams}: {
         notFound();
     }
 
-    const userTransaction = await (new Transaction()).userTransaction<TransactionType>(2);
+    const userTransaction = await (new NewTransaction()).getAUserTransactions(id);
 
     const filteredUserTransaction = userTransaction?.slice(startIndex, endIndex);
 

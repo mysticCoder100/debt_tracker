@@ -6,7 +6,7 @@ export function Header() {
             <SidebarTrigger className="md:hidden"/>
             <div className="flex items-center justify-between w-full">
                 <h3>
-                    Debit Tracker
+                    Debt Tracker
                 </h3>
                 <div className="border-2 border-grey-400 w-8 aspect-square rounded-full">
                    <span className="m-auto">
